@@ -22,14 +22,18 @@ public sealed class GameManagerSystem : UpdateSystem, IInRoomCallbacks {
         if (!gameManagerComponent.haveLocalPlayer)
         {
             Vector3 newPlayerPos;
+            Material playerMaterial;
             if (PhotonNetwork.IsMasterClient)
             {
                 newPlayerPos = new Vector3(gameConfig.levelScale.x * 5 - 0.2f, 0.5f, gameConfig.levelScale.y * 5 - 0.2f);
+                playerMaterial = Resources.Load("RedPlayer") as Material;
             } else
             {
                 newPlayerPos = new Vector3(-gameConfig.levelScale.x * 5 - 0.2f, 0.5f, -gameConfig.levelScale.y * 5 - 0.2f);
+                playerMaterial = Resources.Load("BluePlayer") as Material;
             }
             var player = PhotonNetwork.Instantiate(gameConfig.playerPrefab.name, newPlayerPos, Quaternion.identity);
+            player.GetComponent<MeshRenderer>().material = playerMaterial;
             gameManagerComponent.virtualCamera.m_LookAt = player.transform;
         }
     }
@@ -58,8 +62,8 @@ public sealed class GameManagerSystem : UpdateSystem, IInRoomCallbacks {
         Debug.LogFormat("<color=green>GameManager: </color>player {0} left room, players count now is - {1}", otherPlayer.NickName, PhotonNetwork.CurrentRoom.PlayerCount);
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
             PhotonNetwork.LeaveRoom();
+            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
         }
     }
 

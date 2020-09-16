@@ -23,7 +23,7 @@ public sealed class PlayerSystem : UpdateSystem {
         foreach(var entity in filter)
         {
             ref var photonView = ref entity.GetComponent<PhotonViewComponent>().photonView;
-            if (!photonView.IsMine) return;
+            if (!photonView.IsMine) continue;
             ref var playerComponent = ref entity.GetComponent<PlayerComponent>();
             if (Input.GetMouseButtonDown(0))
             {
