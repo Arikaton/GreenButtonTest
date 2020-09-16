@@ -5,6 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+using Photon.Pun.UtilityScripts;
 
 [Il2CppSetOption(Option.NullChecks, false)]
 [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
@@ -30,22 +31,40 @@ public sealed class GameManagerSystem : UpdateSystem, IInRoomCallbacks {
     private void InstantiateNewLocalPlayer(ref GameManagerComponent gameManagerComponent)
     {
         Vector3 newPlayerPos;
-        Material playerMaterial;
         if (PhotonNetwork.IsMasterClient)
         {
             newPlayerPos = new Vector3(gameConfig.levelScale.x * 5 - 0.2f, 0.5f, gameConfig.levelScale.y * 5 - 0.2f);
-            playerMaterial = Resources.Load("RedPlayer") as Material;
         }
         else
         {
             newPlayerPos = new Vector3(-gameConfig.levelScale.x * 5 - 0.2f, 0.5f, -gameConfig.levelScale.y * 5 - 0.2f);
-            playerMaterial = Resources.Load("BluePlayer") as Material;
         }
+
         var player = PhotonNetwork.Instantiate(gameConfig.playerPrefab.name, newPlayerPos, Quaternion.identity);
-        player.GetComponent<MeshRenderer>().material = playerMaterial;
+        var photonView = player.GetComponent<PhotonView>();
+        var newMaterial = GetMaterialByPlayerNumber(photonView.Owner.GetPlayerNumber());
+        player.GetComponent<MeshRenderer>().material = newMaterial;
         ref var playerData = ref player.GetComponent<MoveViewProvider>().GetData();
         playerData.agent.speed = gameConfig.playerSpeed;
         gameManagerComponent.virtualCamera.m_LookAt = player.transform;
+    }
+
+    Material GetMaterialByPlayerNumber(int playerNumber)
+    {
+        Material playerMaterial;
+        switch (playerNumber)
+        {
+            case 1:
+                playerMaterial = Resources.Load("RedPlayer") as Material;
+                break;
+            case 2:
+                playerMaterial = Resources.Load("BluePlayer") as Material;
+                break;
+            default:
+                playerMaterial = Resources.Load("RedPlayer") as Material;
+                break;
+        }
+        return playerMaterial;
     }
 
     public override void Dispose()
