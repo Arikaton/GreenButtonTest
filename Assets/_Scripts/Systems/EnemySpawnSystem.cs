@@ -18,6 +18,7 @@ public sealed class EnemySpawnSystem : UpdateSystem {
 
     public override void OnUpdate(float deltaTime) {
         if (!PhotonNetwork.IsMasterClient) return;
+
         ref var enemyComponent = ref filter.Select<EnemySpawnComponent>().GetComponent(0);
         if (enemyComponent.timeAfterSpawnPrevEnemy >= gameConfig.enemySpawnDelay)
         {
@@ -26,6 +27,9 @@ public sealed class EnemySpawnSystem : UpdateSystem {
                 0.35f,
                 Random.Range(-gameConfig.levelScale.y * 5, gameConfig.levelScale.y * 5));
             var enemy = PhotonNetwork.Instantiate(gameConfig.enemyPrefab.name, newEnemyPos, Quaternion.identity);
+            ref var enemyMoveData = ref enemy.GetComponent<MoveViewProvider>().GetData();
+            enemyMoveData.agent.speed = gameConfig.enemySpeed;
+
             enemyComponent.timeAfterSpawnPrevEnemy = 0;
         } else
         {
