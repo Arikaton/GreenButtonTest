@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5960191afd749f3a2fb36a87cda22a, type: 3}
+  m_Name: Game Config
+  m_EditorClassIdentifier: 
+  levelScale: {x: 3, y: 3}
+  playerSpeed: 8
+  enemySpeed: 5
+  enemyAttackRadius: 1
+  enemySuspicionRadius: 5
+  enemySpawnDelay: 5
+  enemyAttackDelay: 2
+  playerPrefab: {fileID: 2825549285570212909, guid: e10a47bce985d4c28b58f9a98ccf084a,
+    type: 3}
+  enemyPrefab: {fileID: 4111758084590904998, guid: 55dabb03afc50459dab13e876c8a8f45,
+    type: 3}
