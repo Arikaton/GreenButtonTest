@@ -33,9 +33,15 @@ public sealed class GameManagerSystem : UpdateSystem, IInRoomCallbacks {
                 playerMaterial = Resources.Load("BluePlayer") as Material;
             }
             var player = PhotonNetwork.Instantiate(gameConfig.playerPrefab.name, newPlayerPos, Quaternion.identity);
-            player.GetComponent<MeshRenderer>().material = playerMaterial;
+            //player.GetComponent<MeshRenderer>().material = playerMaterial;
+            player.GetComponent<PhotonView>().RPC("SetPlayerMaterial", RpcTarget.AllBuffered, player, playerMaterial);
             gameManagerComponent.virtualCamera.m_LookAt = player.transform;
         }
+    }
+
+    void SetPlayerMaterial(GameObject player, Material material)
+    {
+        player.GetComponent<MeshRenderer>().material = material;
     }
 
     public override void Dispose()

@@ -2,6 +2,7 @@
 using UnityEngine;
 using Unity.IL2CPP.CompilerServices;
 using System.Collections;
+using Photon.Pun;
 
 [Il2CppSetOption(Option.NullChecks, false)]
 [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
@@ -19,11 +20,11 @@ public sealed class EnemySpawnSystem : UpdateSystem {
         ref var enemyComponent = ref filter.Select<EnemySpawnComponent>().GetComponent(0);
         if (enemyComponent.timeAfterSpawnPrevEnemy >= gameConfig.enemySpawnDelay)
         {
-            var enemy = Instantiate(gameConfig.enemyPrefab);
-            enemy.transform.position = new Vector3(
+            var newEnemyPos = new Vector3(
                 Random.Range(-gameConfig.levelScale.x * 5, gameConfig.levelScale.x * 5),
                 0.35f,
                 Random.Range(-gameConfig.levelScale.y * 5, gameConfig.levelScale.y * 5));
+            var enemy = PhotonNetwork.Instantiate(gameConfig.enemyPrefab.name, newEnemyPos, Quaternion.identity);
             enemyComponent.timeAfterSpawnPrevEnemy = 0;
         } else
         {
