@@ -18,28 +18,34 @@ public sealed class GameManagerSystem : UpdateSystem, IInRoomCallbacks {
         PhotonNetwork.AddCallbackTarget(this);
 
         filter = World.Filter.With<GameManagerComponent>();
-        Debug.Log("Game Manager: " + filter.Length);
         ref var gameManagerComponent = ref filter.First().GetComponent<GameManagerComponent>();
+
         if (!gameManagerComponent.haveLocalPlayer)
         {
-            Vector3 newPlayerPos;
-            Material playerMaterial;
-            if (PhotonNetwork.IsMasterClient)
-            {
-                newPlayerPos = new Vector3(gameConfig.levelScale.x * 5 - 0.2f, 0.5f, gameConfig.levelScale.y * 5 - 0.2f);
-                playerMaterial = Resources.Load("RedPlayer") as Material;
-            } else
-            {
-                newPlayerPos = new Vector3(-gameConfig.levelScale.x * 5 - 0.2f, 0.5f, -gameConfig.levelScale.y * 5 - 0.2f);
-                playerMaterial = Resources.Load("BluePlayer") as Material;
-            }
-            var player = PhotonNetwork.Instantiate(gameConfig.playerPrefab.name, newPlayerPos, Quaternion.identity);
-            player.GetComponent<MeshRenderer>().material = playerMaterial;
-            Hashtable playerProperties = new Hashtable();
-            playerProperties.Add("playerMaterial", playerMaterial);
-            PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
-            gameManagerComponent.virtualCamera.m_LookAt = player.transform;
+            InstantiateNewLocalPlayer(ref gameManagerComponent);
+            gameManagerComponent.haveLocalPlayer = true;
         }
+    }
+
+    private void InstantiateNewLocalPlayer(ref GameManagerComponent gameManagerComponent)
+    {
+        Vector3 newPlayerPos;
+        Material playerMaterial;
+        if (PhotonNetwork.IsMasterClient)
+        {
+            newPlayerPos = new Vector3(gameConfig.levelScale.x * 5 - 0.2f, 0.5f, gameConfig.levelScale.y * 5 - 0.2f);
+            playerMaterial = Resources.Load("RedPlayer") as Material;
+        }
+        else
+        {
+            newPlayerPos = new Vector3(-gameConfig.levelScale.x * 5 - 0.2f, 0.5f, -gameConfig.levelScale.y * 5 - 0.2f);
+            playerMaterial = Resources.Load("BluePlayer") as Material;
+        }
+        var player = PhotonNetwork.Instantiate(gameConfig.playerPrefab.name, newPlayerPos, Quaternion.identity);
+        player.GetComponent<MeshRenderer>().material = playerMaterial;
+        ref var playerData = ref player.GetComponent<MoveViewProvider>().GetData();
+        playerData.agent.speed = gameConfig.playerSpeed;
+        gameManagerComponent.virtualCamera.m_LookAt = player.transform;
     }
 
     public override void Dispose()
