@@ -4,6 +4,7 @@ using Unity.IL2CPP.CompilerServices;
 using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 [Il2CppSetOption(Option.NullChecks, false)]
 [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
@@ -33,15 +34,12 @@ public sealed class GameManagerSystem : UpdateSystem, IInRoomCallbacks {
                 playerMaterial = Resources.Load("BluePlayer") as Material;
             }
             var player = PhotonNetwork.Instantiate(gameConfig.playerPrefab.name, newPlayerPos, Quaternion.identity);
-            //player.GetComponent<MeshRenderer>().material = playerMaterial;
-            player.GetComponent<PhotonView>().RPC("SetPlayerMaterial", RpcTarget.AllBuffered, player, playerMaterial);
+            player.GetComponent<MeshRenderer>().material = playerMaterial;
+            Hashtable playerProperties = new Hashtable();
+            playerProperties.Add("playerMaterial", playerMaterial);
+            PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
             gameManagerComponent.virtualCamera.m_LookAt = player.transform;
         }
-    }
-
-    void SetPlayerMaterial(GameObject player, Material material)
-    {
-        player.GetComponent<MeshRenderer>().material = material;
     }
 
     public override void Dispose()

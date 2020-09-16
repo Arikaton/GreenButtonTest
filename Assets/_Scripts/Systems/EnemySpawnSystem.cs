@@ -17,6 +17,7 @@ public sealed class EnemySpawnSystem : UpdateSystem {
     }
 
     public override void OnUpdate(float deltaTime) {
+        if (!PhotonNetwork.IsMasterClient) return;
         ref var enemyComponent = ref filter.Select<EnemySpawnComponent>().GetComponent(0);
         if (enemyComponent.timeAfterSpawnPrevEnemy >= gameConfig.enemySpawnDelay)
         {
