@@ -6,15 +6,9 @@ using System.Diagnostics;
 
 public class PhotonHealthView : MonoBehaviourPunCallbacks, IPunObservable
 {
-    HealthProvider healthProvider;
-
-    private void Start()
-    {
-        healthProvider = GetComponent<HealthProvider>();
-    }
-
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
+        var healthProvider = GetComponent<HealthProvider>();
         ref var healthData = ref healthProvider.GetData();
         if (stream.IsWriting)
         {
