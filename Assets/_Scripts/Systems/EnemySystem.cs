@@ -2,6 +2,7 @@
 using UnityEngine;
 using Unity.IL2CPP.CompilerServices;
 using System.Collections.Generic;
+using Photon.Pun;
 
 [Il2CppSetOption(Option.NullChecks, false)]
 [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
@@ -9,29 +10,30 @@ using System.Collections.Generic;
 [CreateAssetMenu(menuName = "ECS/Systems/" + nameof(EnemySystem))]
 public sealed class EnemySystem : UpdateSystem {
     public GameConfig gameConfig;
-    Filter filter;
+    Filter enemyFilter;
     Filter playerFilter;
 
     public override void OnAwake() {
-        var commonFilter = World.Filter.With<MoveViewComponent>();
-        filter = commonFilter.With<EnemyComponent>();
-        playerFilter = commonFilter.With<PlayerComponent>();
+        enemyFilter = World.Filter.With<EnemyComponent>();
+        playerFilter = World.Filter.With<PlayerComponent>();
     }
 
     public override void OnUpdate(float deltaTime) {
-        var enemiesBag = filter.Select<EnemyComponent>();
-        var moveBag = filter.Select<MoveViewComponent>();
+        if (!PhotonNetwork.IsMasterClient) return;
 
-        for (int i = 0, lenght = filter.Length; i < lenght; i++)
+        var enemiesBag = enemyFilter.Select<EnemyComponent>();
+        var moveBag = enemyFilter.Select<MoveViewComponent>();
+
+        for (int i = 0, lenght = enemyFilter.Length; i < lenght; i++)
         {
             ref var enemy = ref enemiesBag.GetComponent(i);
             ref var enemyMove = ref moveBag.GetComponent(i);
 
-            TryFindEnemy(ref enemy, ref enemyMove);
+            TryFindPlayer(ref enemy, ref enemyMove);
         }
     }
 
-    private void TryFindEnemy(ref EnemyComponent enemy, ref MoveViewComponent enemyMove)
+    private void TryFindPlayer(ref EnemyComponent enemy, ref MoveViewComponent enemyMove)
     {
         float minDistance = 1000;
         Entity entityHolder = null;

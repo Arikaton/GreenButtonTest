@@ -17,6 +17,8 @@ public sealed class EnemyAttackSystem : UpdateSystem {
     }
 
     public override void OnUpdate(float deltaTime) {
+        if (!PhotonNetwork.IsMasterClient) return;
+
         var enemyBag = enemyFilter.Select<EnemyComponent>();
 
         for (int i = 0, lenght = enemyFilter.Length; i < lenght; i++)
@@ -28,10 +30,11 @@ public sealed class EnemyAttackSystem : UpdateSystem {
                 {
                     enemy.aim.GetComponent<HealthComponent>().health--;
                     enemy.timeAfterLastAttack = 0;
-                } else
-                {
-                    enemy.timeAfterLastAttack += deltaTime;
-                }
+                } 
+            }
+            else
+            {
+                enemy.timeAfterLastAttack += deltaTime;
             }
         }
     }

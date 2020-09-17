@@ -1,6 +1,7 @@
 ﻿using Morpeh;
 using UnityEngine;
 using Unity.IL2CPP.CompilerServices;
+using Photon.Pun;
 
 [Il2CppSetOption(Option.NullChecks, false)]
 [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
@@ -11,10 +12,12 @@ public sealed class EnemyMoveSystem : UpdateSystem {
     Filter enemyFilter;
 
     public override void OnAwake() {
-        enemyFilter = World.Filter.With<EnemyComponent>().With<MoveViewComponent>();
+        enemyFilter = World.Filter.With<EnemyComponent>();
     }
 
     public override void OnUpdate(float deltaTime) {
+        if (!PhotonNetwork.IsMasterClient) return;
+
         var enemyBag = enemyFilter.Select<EnemyComponent>();
         var moveBag = enemyFilter.Select<MoveViewComponent>();
 

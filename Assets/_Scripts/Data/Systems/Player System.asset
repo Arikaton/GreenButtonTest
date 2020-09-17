@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dd59ee89748e44a99076da7aee33b1d, type: 3}
   m_Name: Player System
   m_EditorClassIdentifier: 
+  leaveRoom: {fileID: 11400000, guid: 710641b8471f1704092154cb6cea7e4e, type: 2}

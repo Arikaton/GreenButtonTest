@@ -16,9 +16,9 @@ GameObject:
   - component: {fileID: 2825549285570212900}
   - component: {fileID: 2825549285570212899}
   - component: {fileID: 8162399884610364613}
-  - component: {fileID: 2642840860749171836}
   - component: {fileID: 2346445599234197422}
   - component: {fileID: 1221198708333243541}
+  - component: {fileID: 4865161248526313246}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -137,6 +137,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializedData:
     destination: {x: 0, y: 0, z: 0}
+    meshRenderer: {fileID: 2825549285570212911}
+    actorNumber: 0
 --- !u!114 &2825549285570212899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -171,26 +173,11 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   ObservedComponents:
-  - {fileID: 2642840860749171836}
   - {fileID: 2346445599234197422}
+  - {fileID: 4865161248526313246}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &2642840860749171836
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2825549285570212909}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
 --- !u!114 &2346445599234197422
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,3 +204,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializedData:
     photonView: {fileID: 8162399884610364613}
+--- !u!114 &4865161248526313246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2825549285570212909}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0

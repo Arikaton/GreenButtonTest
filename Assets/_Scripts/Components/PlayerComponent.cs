@@ -8,4 +8,6 @@ using Unity.IL2CPP.CompilerServices;
 [System.Serializable]
 public struct PlayerComponent : IComponent {
     public Vector3 destination;
+    public MeshRenderer meshRenderer;
+    public int actorNumber;
 }

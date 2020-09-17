@@ -16,6 +16,9 @@ public sealed class PlayerMoveSystem : UpdateSystem {
     public override void OnUpdate(float deltaTime) {
         foreach (var entity in filter)
         {
+            ref var photonViewComponent = ref entity.GetComponent<PhotonViewComponent>();
+            if (!photonViewComponent.photonView.IsMine) continue;
+
             ref var playerComponent = ref entity.GetComponent<PlayerComponent>();
             ref var playerViewComponent = ref entity.GetComponent<MoveViewComponent>();
 
