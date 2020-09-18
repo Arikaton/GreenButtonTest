@@ -15,7 +15,8 @@ public sealed class PlayerUISystem : UpdateSystem {
         uiFilter = World.Filter.With<PlayerUIComponent>();
 
         ref var uiComponent = ref uiFilter.Select<PlayerUIComponent>().GetComponent(0);
-        ref var healthComponent = ref playerFilter.Select<HealthComponent>().GetComponent(0); //Not really matter which entity has that component, cause all players have eq health in begin;
+        //Not really matter which entity has that component, cause all players have eq health in begin;
+        ref var healthComponent = ref playerFilter.Select<HealthComponent>().GetComponent(0); 
         uiComponent.healthSlider.maxValue = healthComponent.health;
     }
 

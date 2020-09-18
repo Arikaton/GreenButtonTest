@@ -17,7 +17,7 @@ public sealed class EnemyAttackSystem : UpdateSystem {
     }
 
     public override void OnUpdate(float deltaTime) {
-        if (!PhotonNetwork.IsMasterClient) return;
+        //if (!PhotonNetwork.IsMasterClient) return;
 
         var enemyBag = enemyFilter.Select<EnemyComponent>();
 
