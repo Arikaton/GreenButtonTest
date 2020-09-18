@@ -24,6 +24,7 @@ public sealed class PlayerUISystem : UpdateSystem {
         var healthBug = playerFilter.Select<HealthComponent>();
         var photonViewBug = playerFilter.Select<PhotonViewComponent>();
         ref var uiComponent = ref uiFilter.Select<PlayerUIComponent>().GetComponent(0);
+
         for (int i = 0, lenght = playerFilter.Length; i < lenght; i++)
         {
             ref var photonView = ref photonViewBug.GetComponent(i);
