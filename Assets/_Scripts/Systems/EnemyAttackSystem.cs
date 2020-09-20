@@ -2,6 +2,8 @@
 using UnityEngine;
 using Unity.IL2CPP.CompilerServices;
 using Photon.Pun;
+using Morpeh.Globals;
+using ExitGames.Client.Photon;
 
 [Il2CppSetOption(Option.NullChecks, false)]
 [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
@@ -17,7 +19,7 @@ public sealed class EnemyAttackSystem : UpdateSystem {
     }
 
     public override void OnUpdate(float deltaTime) {
-        //if (!PhotonNetwork.IsMasterClient) return;
+        if (!PhotonNetwork.IsMasterClient) return;
         var enemyBag = enemyFilter.Select<EnemyComponent>();
 
         for (int i = 0, lenght = enemyFilter.Length; i < lenght; i++)
@@ -27,14 +29,17 @@ public sealed class EnemyAttackSystem : UpdateSystem {
             {
                 if (enemy.timeAfterLastAttack >= gameConfig.enemyAttackDelay)
                 {
-                    enemy.aim.GetComponent<HealthComponent>().health--;
+                    Hashtable hash = new Hashtable
+                    {
+                        {"GetDamage", true }
+                    };
+                    enemy.aim.GetComponent<PhotonViewComponent>().photonView.Owner.SetCustomProperties(hash);
+
                     enemy.timeAfterLastAttack = 0;
-                } 
+                }
             }
-            else
-            {
-                enemy.timeAfterLastAttack += deltaTime;
-            }
+
+            enemy.timeAfterLastAttack += deltaTime;
         }
     }
 }

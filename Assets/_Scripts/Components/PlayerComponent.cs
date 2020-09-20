@@ -7,7 +7,7 @@ using Unity.IL2CPP.CompilerServices;
 [Il2CppSetOption(Option.DivideByZeroChecks, false)]
 [System.Serializable]
 public struct PlayerComponent : IComponent {
-    public Vector3 destination;
+    public Vector3? destination;
     public MeshRenderer meshRenderer;
     public int actorNumber;
 }

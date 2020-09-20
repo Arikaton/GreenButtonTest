@@ -13,3 +13,7 @@ MonoBehaviour:
   m_Name: Player System
   m_EditorClassIdentifier: 
   leaveRoom: {fileID: 11400000, guid: 710641b8471f1704092154cb6cea7e4e, type: 2}
+  playerDied: {fileID: 11400000, guid: 95904ca5a4c4d4bc99a4090aabbf2737, type: 2}
+  playerMaterials:
+  - {fileID: 2100000, guid: 3334b245749ab482d90d3fba0fe3f036, type: 2}
+  - {fileID: 2100000, guid: a34fe0ba3d4b0436095d96c72fa8c0f7, type: 2}

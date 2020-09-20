@@ -9,4 +9,6 @@ using UnityEngine.UI;
 [System.Serializable]
 public struct PlayerUIComponent : IComponent {
     public Slider healthSlider;
+    public GameObject winPopUp;
+    public GameObject losePopUp;
 }

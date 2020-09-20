@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: FogMaterial
+  m_Name: FogLauncher
   m_Shader: {fileID: 4800000, guid: 989794110ce4ee14aa3f0a65b6ad927c, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -63,7 +63,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _IntersectionThresholdMax: 0.02
+    - _IntersectionThresholdMax: 0.62
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1

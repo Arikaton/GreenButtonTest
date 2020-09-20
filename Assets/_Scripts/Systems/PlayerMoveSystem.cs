@@ -19,10 +19,15 @@ public sealed class PlayerMoveSystem : UpdateSystem {
             ref var photonViewComponent = ref entity.GetComponent<PhotonViewComponent>();
             if (!photonViewComponent.photonView.IsMine) continue;
 
-            ref var playerComponent = ref entity.GetComponent<PlayerComponent>();
-            ref var playerViewComponent = ref entity.GetComponent<MoveViewComponent>();
+            ref var healthComponent = ref entity.GetComponent<HealthComponent>();
+            if (healthComponent.health <= 0) continue;
 
-            playerViewComponent.agent.SetDestination(playerComponent.destination);
+            ref var playerComponent = ref entity.GetComponent<PlayerComponent>();
+            if (playerComponent.destination == null) continue;
+
+            ref var playerViewComponent = ref entity.GetComponent<MoveViewComponent>();
+            
+            playerViewComponent.agent.SetDestination((Vector3)playerComponent.destination);
         }
     }
 }

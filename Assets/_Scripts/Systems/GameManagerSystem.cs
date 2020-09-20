@@ -6,18 +6,24 @@ using Photon.Realtime;
 using ExitGames.Client.Photon;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Photon.Pun.UtilityScripts;
+using Morpeh.Globals;
 
 [Il2CppSetOption(Option.NullChecks, false)]
 [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 [Il2CppSetOption(Option.DivideByZeroChecks, false)]
 [CreateAssetMenu(menuName = "ECS/Systems/" + nameof(GameManagerSystem))]
 public sealed class GameManagerSystem : UpdateSystem {
+    public GlobalEvent playerDied;
+    public GlobalEvent createSpectator;
+
     public GameConfig gameConfig;
     Filter filter;
+    Filter playerFilter;
 
     public override void OnAwake() {
 
         filter = World.Filter.With<GameManagerComponent>();
+        playerFilter = World.Filter.With<PlayerComponent>();
         ref var gameManagerComponent = ref filter.First().GetComponent<GameManagerComponent>();
 
         if (!gameManagerComponent.haveLocalPlayer)
@@ -45,16 +51,25 @@ public sealed class GameManagerSystem : UpdateSystem {
         playerData.agent.speed = gameConfig.playerSpeed;
         gameManagerComponent.virtualCamera.m_LookAt = player.transform;
 
-        Hashtable props = new Hashtable
+        /*Hashtable props = new Hashtable
             {
                 {"PlayerLoadGame", true}
             };
-        PhotonNetwork.LocalPlayer.SetCustomProperties(props);
-        //UpdatePlayersMaterials();
+        PhotonNetwork.LocalPlayer.SetCustomProperties(props);*/
     }
 
     public override void OnUpdate(float deltaTime)
     {
-        
+        /*if (createSpectator.IsPublished)
+        {
+            foreach (var entity in playerFilter)
+            {
+                ref var photonViewComponent = ref entity.GetComponent<PhotonViewComponent>();
+                if (!photonViewComponent.photonView.IsMine) continue;
+
+                ref var moveComponent = ref entity.GetComponent<MoveViewComponent>();
+                Destroy(moveComponent.transform.gameObject);
+            }
+        }*/
     }
 }

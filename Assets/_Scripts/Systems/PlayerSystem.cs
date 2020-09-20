@@ -13,6 +13,9 @@ using Photon.Pun.UtilityScripts;
 [CreateAssetMenu(menuName = "ECS/Systems/" + nameof(PlayerSystem))]
 public sealed class PlayerSystem : UpdateSystem, IInRoomCallbacks {
     public GlobalEvent leaveRoom;
+    public GlobalEvent playerDied;
+    public Material[] playerMaterials;
+
     Filter filter;
     Camera camera;
 
@@ -26,7 +29,8 @@ public sealed class PlayerSystem : UpdateSystem, IInRoomCallbacks {
     {
         base.Dispose();
         PhotonNetwork.RemoveCallbackTarget(this);
-        PhotonNetwork.LeaveRoom();
+        if (PhotonNetwork.IsConnected)
+            PhotonNetwork.LeaveRoom();
     }
 
     public override void OnUpdate(float deltaTime) {
@@ -41,7 +45,7 @@ public sealed class PlayerSystem : UpdateSystem, IInRoomCallbacks {
                 Debug.Log("ActorNumber: " + photonView.Owner.ActorNumber);
                 playerComponent.actorNumber = photonView.Owner.ActorNumber;
             }
-            playerComponent.meshRenderer.material = GetMaterialByPlayerNumber(playerComponent.actorNumber);
+            playerComponent.meshRenderer.material = playerMaterials[playerComponent.actorNumber - 1];//GetMaterialByPlayerNumber(playerComponent.actorNumber);
 
             if (!photonView.IsMine) continue;
             //ref var playerComponent = ref entity.GetComponent<PlayerComponent>();
@@ -65,12 +69,12 @@ public sealed class PlayerSystem : UpdateSystem, IInRoomCallbacks {
 
     public void OnMasterClientSwitched(Player newMasterClient)
     {
-        throw new System.NotImplementedException();
+        Debug.Log("Master Client was switched");
     }
 
     public void OnPlayerEnteredRoom(Player newPlayer)
     {
-        throw new System.NotImplementedException();
+        Debug.Log("New Player entered  in room");
     }
 
     public void OnPlayerLeftRoom(Player otherPlayer)
@@ -89,7 +93,23 @@ public sealed class PlayerSystem : UpdateSystem, IInRoomCallbacks {
 
     public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
     {
-        
+        if (changedProps.ContainsKey("GetDamage"))
+        {
+            Debug.Log(targetPlayer.ToString() + "got damage");
+            foreach(var player in filter)
+            {
+                ref var photonViewComponent = ref player.GetComponent<PhotonViewComponent>();
+                if (photonViewComponent.photonView.Owner == targetPlayer)
+                {
+                    ref var healthComponent = ref player.GetComponent<HealthComponent>();
+                    healthComponent.health--;
+                    if (healthComponent.health <= 0)
+                    {
+                        playerDied.Publish();
+                    }
+                }
+            }
+        }
     }
 
     Material GetMaterialByPlayerNumber(int playerNumber)
@@ -112,6 +132,6 @@ public sealed class PlayerSystem : UpdateSystem, IInRoomCallbacks {
 
     public void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
     {
-        throw new System.NotImplementedException();
+        Debug.Log("Room properties was updated");
     }
 }

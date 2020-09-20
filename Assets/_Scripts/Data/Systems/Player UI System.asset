@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1db9de4be4f626b43b9214a4972f527b, type: 3}
   m_Name: Player UI System
   m_EditorClassIdentifier: 
+  playerDied: {fileID: 11400000, guid: 95904ca5a4c4d4bc99a4090aabbf2737, type: 2}

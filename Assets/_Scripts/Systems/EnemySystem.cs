@@ -19,7 +19,7 @@ public sealed class EnemySystem : UpdateSystem {
     }
 
     public override void OnUpdate(float deltaTime) {
-        if (!PhotonNetwork.IsMasterClient) return;
+        //if (!PhotonNetwork.IsMasterClient) return;
 
         var enemiesBag = enemyFilter.Select<EnemyComponent>();
         var moveBag = enemyFilter.Select<MoveViewComponent>();
@@ -41,6 +41,9 @@ public sealed class EnemySystem : UpdateSystem {
         foreach (var player in playerFilter)
         {
             ref var playerMove = ref player.GetComponent<MoveViewComponent>();
+            ref var playerHealthComponent = ref player.GetComponent<HealthComponent>();
+            if (playerHealthComponent.health <= 0) continue;
+
             var distanceToPlayer = Vector2.Distance(Utils.ConvertToV2(enemyMove.transform.position), Utils.ConvertToV2(playerMove.transform.position));
             if (distanceToPlayer <= gameConfig.enemySuspicionRadius)
             {
@@ -48,7 +51,6 @@ public sealed class EnemySystem : UpdateSystem {
                 {
                     entityHolder = player;
                     minDistance = distanceToPlayer;
-                    
                 }
             }
         }
