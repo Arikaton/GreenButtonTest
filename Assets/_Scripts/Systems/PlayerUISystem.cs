@@ -3,17 +3,22 @@ using UnityEngine;
 using Unity.IL2CPP.CompilerServices;
 using Photon.Pun;
 using Morpeh.Globals;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 [Il2CppSetOption(Option.NullChecks, false)]
 [Il2CppSetOption(Option.ArrayBoundsChecks, false)]
 [Il2CppSetOption(Option.DivideByZeroChecks, false)]
 [CreateAssetMenu(menuName = "ECS/Systems/" + nameof(PlayerUISystem))]
-public sealed class PlayerUISystem : UpdateSystem {
-    public GlobalEvent playerDied;
+public sealed class PlayerUISystem : UpdateSystem, IInRoomCallbacks {
+    public GlobalEvent createSpectator;
 
     Filter playerFilter;
     Filter uiFilter;
+
     public override void OnAwake() {
+        PhotonNetwork.AddCallbackTarget(this);
+
         playerFilter = World.Filter.With<PlayerComponent>();
         uiFilter = World.Filter.With<PlayerUIComponent>();
 
@@ -25,48 +30,71 @@ public sealed class PlayerUISystem : UpdateSystem {
         uiComponent.losePopUp.SetActive(false);
     }
 
+    public override void Dispose()
+    {
+        base.Dispose();
+        PhotonNetwork.RemoveCallbackTarget(this);
+    }
+
     public override void OnUpdate(float deltaTime) {
         var healthBug = playerFilter.Select<HealthComponent>();
         var photonViewBug = playerFilter.Select<PhotonViewComponent>();
         ref var uiComponent = ref uiFilter.Select<PlayerUIComponent>().GetComponent(0);
-        Debug.Log("PlayerFilter lenght is " + playerFilter.Length);
+
+        if (createSpectator.IsPublished)
+        {
+            uiComponent.losePopUp.SetActive(false);
+        }
 
         for (int i = 0, lenght = playerFilter.Length; i < lenght; i++)
         {
             ref var healthComponent = ref healthBug.GetComponent(i);
-            if (playerDied.IsPublished)
-            {
-                if (healthComponent.health <= 0)
-                {
-                    uiComponent.losePopUp.SetActive(true);
-                } else
-                {
-                    if (playerFilter.Length <= 2 && !uiComponent.losePopUp.activeSelf)
-                    {
-                        uiComponent.winPopUp.SetActive(true);
-                    }
-                }
-            }
 
             ref var photonView = ref photonViewBug.GetComponent(i);
             if (!photonView.photonView.IsMine) continue;
 
-            //ref var healthComponent = ref healthBug.GetComponent(i);
             uiComponent.healthSlider.value = healthComponent.health;
+        }
+    }
 
-            if (healthComponent.health <= 0)
+    public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+        ref var uiComponent = ref uiFilter.Select<PlayerUIComponent>().GetComponent(0);
+        if (changedProps.ContainsKey("PlayerDied"))
+        {
+            if (targetPlayer.IsLocal && !uiComponent.winPopUp.activeSelf)
             {
+                uiComponent.healthSlider.value = 0;
                 uiComponent.losePopUp.SetActive(true);
+            } else
+            {
+                int livePlayerCount = Utils.GetLivesPlayerCount();
+                Debug.Log("Lives player count: " + livePlayerCount);
+                if (livePlayerCount == 1 && !uiComponent.losePopUp.activeSelf && !PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("PlayerDied"))
+                {
+                    uiComponent.winPopUp.SetActive(true);
+                }
             }
         }
-
-        /*if (playerDied.IsPublished)
-        {
-            if (playerFilter.Length == 1 && !uiComponent.losePopUp.activeSelf)
-            {
-                uiComponent.winPopUp.SetActive(true);
-                return;
-            }
-        }*/
     }
+
+    #region not used 
+    public void OnMasterClientSwitched(Player newMasterClient)
+    {
+    }
+
+    public void OnPlayerEnteredRoom(Player newPlayer)
+    {
+    }
+
+    public void OnPlayerLeftRoom(Player otherPlayer)
+    {
+    }
+
+    
+
+    public void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+    {
+    }
+    #endregion
 }

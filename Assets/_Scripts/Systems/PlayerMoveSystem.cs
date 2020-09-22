@@ -8,12 +8,17 @@ using Unity.IL2CPP.CompilerServices;
 [CreateAssetMenu(menuName = "ECS/Systems/" + nameof(PlayerMoveSystem))]
 public sealed class PlayerMoveSystem : UpdateSystem {
     Filter filter;
+    Filter gameManagerFilter;
 
     public override void OnAwake() {
         filter = World.Filter.With<MoveViewComponent>().With<PlayerComponent>();
+        gameManagerFilter = World.Filter.With<GameManagerComponent>();
     }
 
     public override void OnUpdate(float deltaTime) {
+        ref var gameManagerComponent = ref gameManagerFilter.First().GetComponent<GameManagerComponent>();
+        if (gameManagerComponent.gameState != GameState.Playing) return;
+
         foreach (var entity in filter)
         {
             ref var photonViewComponent = ref entity.GetComponent<PhotonViewComponent>();

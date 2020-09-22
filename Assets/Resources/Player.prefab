@@ -137,7 +137,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializedData:
     meshRenderer: {fileID: 2825549285570212911}
-    actorNumber: 0
 --- !u!114 &2825549285570212899
 MonoBehaviour:
   m_ObjectHideFlags: 0

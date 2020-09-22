@@ -9,14 +9,18 @@ using Photon.Pun;
 [CreateAssetMenu(menuName = "ECS/Systems/" + nameof(EnemyMoveSystem))]
 public sealed class EnemyMoveSystem : UpdateSystem {
     public GameConfig gameConfig;
+
     Filter enemyFilter;
+    Filter gameManagerFilter;
 
     public override void OnAwake() {
         enemyFilter = World.Filter.With<EnemyComponent>();
+        gameManagerFilter = World.Filter.With<GameManagerComponent>();
     }
 
     public override void OnUpdate(float deltaTime) {
         if (!PhotonNetwork.IsMasterClient) return;
+        if (gameManagerFilter.First().GetComponent<GameManagerComponent>().gameState != GameState.Playing) return;
 
         var enemyBag = enemyFilter.Select<EnemyComponent>();
         var moveBag = enemyFilter.Select<MoveViewComponent>();
@@ -38,7 +42,7 @@ public sealed class EnemyMoveSystem : UpdateSystem {
             }
         }
     }
-    
+
     Vector3 GetRandomVector3()
     {
         return new Vector3(

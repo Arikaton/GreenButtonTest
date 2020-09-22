@@ -12,30 +12,14 @@ public sealed class LevelInitializer : Initializer {
     Filter enemyFilter;
 
     public override void OnAwake() {
-        Filter commonFilter = World.Filter.With<MoveViewComponent>();
-        enemyFilter = commonFilter.With<EnemyComponent>();
-        playerFilter = commonFilter.With<PlayerComponent>();
+        enemyFilter = World.Filter.With<EnemyComponent>();
+        playerFilter = World.Filter.With<PlayerComponent>();
 
         var ground = World.Filter.With<GroundComponent>().Select<GroundComponent>().GetComponent(0);
         ground.transform.localScale = new Vector3(gameConfig.levelScale.x, 1, gameConfig.levelScale.y);
-
-        foreach (var playerEntity in playerFilter)
-        {
-            ref var playerMove = ref playerEntity.GetComponent<MoveViewComponent>();
-            playerMove.agent.speed = gameConfig.playerSpeed;
-        }
-
-        foreach (var enemyEntity in enemyFilter)
-        {
-            ref var enemyMove = ref enemyEntity.GetComponent<MoveViewComponent>();
-            ref var enemy = ref enemyEntity.GetComponent<EnemyComponent>();
-            enemy.timeAfterLastAttack = float.MaxValue;
-            enemyMove.agent.speed = gameConfig.enemySpeed;
-            
-        }
+        ground.navMeshSurface.BuildNavMesh();
     }
 
     public override void Dispose() {
-        Debug.Log("On Dispose");
     }
 }

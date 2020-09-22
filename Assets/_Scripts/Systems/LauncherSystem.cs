@@ -13,33 +13,87 @@ using ExitGames.Client.Photon;
 [CreateAssetMenu(menuName = "ECS/Systems/" + nameof(LauncherSystem))]
 public sealed class LauncherSystem : UpdateSystem, IMatchmakingCallbacks, IConnectionCallbacks, IInRoomCallbacks {
     public GlobalEvent startGameEvent;
+    public GlobalEvent leaveRoom;
+    public GlobalEvent increasePlayerCount;
+    public GlobalEvent reducePlayerCount;
+
     Filter filter;
 
-    public override void OnAwake() {
+    public override void OnAwake()
+    {
         PhotonNetwork.AddCallbackTarget(this);
         PhotonNetwork.AutomaticallySyncScene = true;
 
         filter = World.Filter.With<LauncherComponent>();
         ref var launcherComponent = ref filter.Select<LauncherComponent>().GetComponent(0);
+
+        InitCanvas(ref launcherComponent);
+        //Automaticly try to connect to master when game started
+        if (!PhotonNetwork.IsConnected)
+            ConnectToMaster(ref launcherComponent);
+    }
+
+    private static void InitCanvas(ref LauncherComponent launcherComponent)
+    {
         launcherComponent.controlPanel.SetActive(true);
         launcherComponent.loader.SetActive(false);
         launcherComponent.waitPanel.SetActive(false);
+        launcherComponent.leaveButton.SetActive(false);
+        launcherComponent.connectedPlayersCount.text = "";
+        launcherComponent.maxPlayerCount.text = launcherComponent.maxPlayersPerRoom.ToString();
     }
 
     public override void OnUpdate(float deltaTime) {
+        ref var launcherComponent = ref filter.Select<LauncherComponent>().GetComponent(0);
+
+        //Update server info
+        if (PhotonNetwork.IsConnected)
+        {
+            launcherComponent.globalPlayerCount.text = PhotonNetwork.CountOfPlayers.ToString();
+            launcherComponent.globalRoomsCount.text = PhotonNetwork.CountOfRooms.ToString();
+        } else
+        {
+            launcherComponent.globalPlayerCount.text = "N/A";
+            launcherComponent.globalRoomsCount.text = "N/A";
+        }
+
         if (startGameEvent.IsPublished)
         {
 			Connect();
 		}
+
+        if (leaveRoom.IsPublished)
+        {
+            PhotonNetwork.LeaveRoom();
+        }
+
+        if (increasePlayerCount.IsPublished)
+        {
+            if (launcherComponent.maxPlayersPerRoom < 4)
+            {
+                launcherComponent.maxPlayersPerRoom++;
+                launcherComponent.maxPlayerCount.text = launcherComponent.maxPlayersPerRoom.ToString();
+            }
+        }
+        if (reducePlayerCount.IsPublished)
+        {
+            if (launcherComponent.maxPlayersPerRoom > 2)
+            {
+                launcherComponent.maxPlayersPerRoom--;
+                launcherComponent.maxPlayerCount.text = launcherComponent.maxPlayersPerRoom.ToString();
+            }
+        }
 	}
 
     public override void Dispose()
     {
         base.Dispose();
-        Debug.Log("On dispose");
         PhotonNetwork.RemoveCallbackTarget(this);
     }
 
+    /// <summary>
+    /// Connect to server and try joing to room. If Failed - create new room.
+    /// </summary>
     void Connect()
 	{
         ref var launcherComponent = ref filter.Select<LauncherComponent>().GetComponent(0);
@@ -48,51 +102,42 @@ public sealed class LauncherSystem : UpdateSystem, IMatchmakingCallbacks, IConne
 		// hide the Play button for visual consistency
 		launcherComponent.controlPanel.SetActive(false);
 		launcherComponent.loader.SetActive(true);
+        launcherComponent.leaveButton.SetActive(true);
 
 		// we check if we are connected or not, we join if we are , else we initiate the connection to the server.
 		if (PhotonNetwork.IsConnected)
 		{
             Debug.Log("Attempt Join Random Room");
 			// #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
-			PhotonNetwork.JoinRandomRoom();
+			PhotonNetwork.JoinRandomRoom(new Hashtable { }, launcherComponent.maxPlayersPerRoom);
 		}
 		else
-		{
-            Debug.Log("Try connect to master");
-			// #Critical, we must first and foremost connect to Photon Online Server.
-			PhotonNetwork.ConnectUsingSettings();
-			PhotonNetwork.GameVersion = launcherComponent.GameVersion;
-		}
-	}
+        {
+            ConnectToMaster(ref launcherComponent);
+        }
+    }
+
+    private static void ConnectToMaster(ref LauncherComponent launcherComponent)
+    {
+        Debug.Log("Try connect to master");
+        // #Critical, we must first and foremost connect to Photon Online Server.
+        PhotonNetwork.ConnectUsingSettings();
+        PhotonNetwork.GameVersion = launcherComponent.GameVersion;
+    }
 
     public void OnCreatedRoom()
     {
         Debug.Log("Create room");
-    }
-
-    public void OnCreateRoomFailed(short returnCode, string message)
-    {
-        Debug.Log("Create room failed with code " + returnCode + " and message: " + message);
-    }
-
-    public void OnFriendListUpdate(List<FriendInfo> friendList)
-    {
+        UpdatePlayerCountText();
     }
 
     public void OnJoinedRoom()
     {
-        //LogFeedback("<Color=Green>OnJoinedRoom</Color> with " + PhotonNetwork.CurrentRoom.PlayerCount + " Player(s)");
-        Debug.Log("PUN Basics Tutorial/Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.\nFrom here on, your game would be running.");
-
-        // #Critical: We only load if we are the first player, else we rely on  PhotonNetwork.AutomaticallySyncScene to sync our instance scene.
+        UpdatePlayerCountText();
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
         {
-            // #Critical
-            // Load the Room Level. 
-            //PhotonNetwork.LoadLevel("GameScene");
             ref var launcherComponent = ref filter.Select<LauncherComponent>().GetComponent(0);
             launcherComponent.waitPanel.SetActive(true);
-
         }
     }
 
@@ -100,24 +145,20 @@ public sealed class LauncherSystem : UpdateSystem, IMatchmakingCallbacks, IConne
     {
         Debug.Log("On Join Random Failed");
         ref var launcherComponent = ref filter.Select<LauncherComponent>().GetComponent(0);
-        //LogFeedback("<Color=Red>OnJoinRandomFailed</Color>: Next -> Create a new Room");
-        //Debug.Log("PUN Basics Tutorial/Launcher:OnJoinRandomFailed() was called by PUN. No random room available, so we create one.\nCalling: PhotonNetwork.CreateRoom");
-
-        // #Critical: we failed to join a random room, maybe none exists or they are all full. No worries, we create a new room.
         PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = launcherComponent.maxPlayersPerRoom });
-    }
-
-    public void OnJoinRoomFailed(short returnCode, string message)
-    {
     }
 
     public void OnLeftRoom()
     {
+        ref var launcherComponent = ref filter.Select<LauncherComponent>().GetComponent(0);
+        launcherComponent.isConnecting = false;
+        InitCanvas(ref launcherComponent);
     }
 
-    public void OnConnected()
+    void UpdatePlayerCountText()
     {
-        Debug.Log("On onnected");
+        ref var launcherComponent = ref filter.Select<LauncherComponent>().GetComponent(0);
+        launcherComponent.connectedPlayersCount.text = PhotonNetwork.CurrentRoom.PlayerCount + "/" + PhotonNetwork.CurrentRoom.MaxPlayers;
     }
 
     public void OnConnectedToMaster()
@@ -127,10 +168,6 @@ public sealed class LauncherSystem : UpdateSystem, IMatchmakingCallbacks, IConne
 
         if (launcherComponent.isConnecting)
         {
-            //LogFeedback("OnConnectedToMaster: Next -> try to Join Random Room");
-            Debug.Log("PUN Basics Tutorial/Launcher: OnConnectedToMaster() was called by PUN. Now this client is connected and could join a room.\n Calling: PhotonNetwork.JoinRandomRoom(); Operation will fail if no room found");
-
-            // #Critical: The first we try to do is to join a potential existing room. If there is, good, else, we'll be called back with OnJoinRandomFailed()
             PhotonNetwork.JoinRandomRoom();
         }
     }
@@ -138,14 +175,43 @@ public sealed class LauncherSystem : UpdateSystem, IMatchmakingCallbacks, IConne
     public void OnDisconnected(DisconnectCause cause)
     {
         ref var launcherComponent = ref filter.Select<LauncherComponent>().GetComponent(0);
-        //LogFeedback("<Color=Red>OnDisconnected</Color> " + cause);
-        Debug.LogError("PUN Basics Tutorial/Launcher:Disconnected");
 
-        // #Critical: we failed to connect or got disconnected. There is not much we can do. Typically, a UI system should be in place to let the user attemp to connect again.
         launcherComponent.loader.SetActive(false);
-
-        launcherComponent.isConnecting = false;
         launcherComponent.controlPanel.SetActive(true);
+        launcherComponent.isConnecting = false;
+    }
+
+    public void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        UpdatePlayerCountText();
+        Debug.Log("Player Entered Room");
+        ref var launcherComponent = ref filter.Select<LauncherComponent>().GetComponent(0);
+        if (PhotonNetwork.CurrentRoom.PlayerCount == launcherComponent.maxPlayersPerRoom)
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.LoadLevel("GameScene");
+            }
+        }
+    }
+
+    public void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        UpdatePlayerCountText();
+    }
+
+    #region not used
+
+    public void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+    {
+    }
+
+    public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+    }
+
+    public void OnMasterClientSwitched(Player newMasterClient)
+    {
     }
 
     public void OnRegionListReceived(RegionHandler regionHandler)
@@ -161,32 +227,23 @@ public sealed class LauncherSystem : UpdateSystem, IMatchmakingCallbacks, IConne
     {
     }
 
-    public void OnPlayerEnteredRoom(Player newPlayer)
+    public void OnConnected()
     {
-        Debug.Log("Player Entered Room");
-        ref var launcherComponent = ref filter.Select<LauncherComponent>().GetComponent(0);
-        if (PhotonNetwork.CurrentRoom.PlayerCount == launcherComponent.maxPlayersPerRoom)
-        {
-            if (PhotonNetwork.IsMasterClient)
-            {
-                PhotonNetwork.LoadLevel("GameScene");
-            }
-        }
+        Debug.Log("On Connected");
     }
 
-    public void OnPlayerLeftRoom(Player otherPlayer)
+    public void OnJoinRoomFailed(short returnCode, string message)
     {
     }
 
-    public void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+    public void OnCreateRoomFailed(short returnCode, string message)
+    {
+        Debug.Log("Create room failed with code " + returnCode + " and message: " + message);
+    }
+
+    public void OnFriendListUpdate(List<FriendInfo> friendList)
     {
     }
 
-    public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
-    {
-    }
-
-    public void OnMasterClientSwitched(Player newMasterClient)
-    {
-    }
+    #endregion
 }

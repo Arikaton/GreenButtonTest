@@ -13,3 +13,7 @@ MonoBehaviour:
   m_Name: Launcher System
   m_EditorClassIdentifier: 
   startGameEvent: {fileID: 11400000, guid: bde3240fd8528412288a3b5ff0c8ff7c, type: 2}
+  leaveRoom: {fileID: 11400000, guid: 710641b8471f1704092154cb6cea7e4e, type: 2}
+  increasePlayerCount: {fileID: 11400000, guid: 6ef2103041472429c95586ba5ae42f92,
+    type: 2}
+  reducePlayerCount: {fileID: 11400000, guid: c0cb6a38915694789a28d52bb8511784, type: 2}

@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41711dd43a344c678c9e7a9dc7b358b1, type: 3}
-  m_Name: PlayerDied
+  m_Script: {fileID: 11500000, guid: e1a6580ba1e5f4bd5b125a9eb1734e25, type: 3}
+  m_Name: Launch Cube System
   m_EditorClassIdentifier: 
-  internalEntityID: -1
+  startGame: {fileID: 11400000, guid: bde3240fd8528412288a3b5ff0c8ff7c, type: 2}
