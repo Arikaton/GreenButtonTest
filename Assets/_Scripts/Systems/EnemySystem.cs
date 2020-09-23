@@ -33,6 +33,9 @@ public sealed class EnemySystem : UpdateSystem {
         }
     }
 
+    /// <summary>
+    /// Finding the nearsest player and set aim to it. If distance less then RAttack, setting isAttacking property true
+    /// </summary>
     private void TryFindPlayer(ref EnemyComponent enemy, ref MoveViewComponent enemyMove)
     {
         float minDistance = 1000;

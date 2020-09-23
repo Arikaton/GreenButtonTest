@@ -19,12 +19,19 @@ public sealed class EnemySpawnSystem : UpdateSystem {
         gameManagerFilter = World.Filter.With<GameManagerComponent>();
     }
 
-    public override void OnUpdate(float deltaTime) {
+    public override void OnUpdate(float deltaTime)
+    {
         if (!PhotonNetwork.IsMasterClient) return;
         if (gameManagerFilter.First().GetComponent<GameManagerComponent>().gameState != GameState.Playing) return;
 
-        ref var enemySpanwComponent = ref filter.Select<EnemySpawnComponent>().GetComponent(0);
-        if (enemySpanwComponent.timeAfterSpawnPrevEnemy >= gameConfig.enemySpawnDelay)
+        ref var enemySpawnComponent = ref filter.Select<EnemySpawnComponent>().GetComponent(0);
+        SpawnEnemy(deltaTime, ref enemySpawnComponent);
+    }
+
+    //Spawn enemy, move it to random pos and define its speed property
+    private void SpawnEnemy(float deltaTime, ref EnemySpawnComponent enemySpawnComponent)
+    {
+        if (enemySpawnComponent.timeAfterSpawnPrevEnemy >= gameConfig.enemySpawnDelay)
         {
             var newEnemyPos = new Vector3(
                 Random.Range(-gameConfig.levelScale.x * 5, gameConfig.levelScale.x * 5),
@@ -34,10 +41,11 @@ public sealed class EnemySpawnSystem : UpdateSystem {
             ref var enemyMoveData = ref enemy.GetComponent<MoveViewProvider>().GetData();
 
             enemyMoveData.agent.speed = gameConfig.enemySpeed;
-            enemySpanwComponent.timeAfterSpawnPrevEnemy = 0;
-        } else
+            enemySpawnComponent.timeAfterSpawnPrevEnemy = 0;
+        }
+        else
         {
-            enemySpanwComponent.timeAfterSpawnPrevEnemy += deltaTime;
+            enemySpawnComponent.timeAfterSpawnPrevEnemy += deltaTime;
         }
     }
 }

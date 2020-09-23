@@ -56,6 +56,7 @@ public sealed class PlayerSystem : UpdateSystem, IInRoomCallbacks
 
             ref var playerComponent = ref entity.GetComponent<PlayerComponent>();
 
+            //if click, find ray intersection with ground and set this point to player's destination
             if (Input.GetMouseButtonDown(0))
             {
                 RaycastHit hitInfo;

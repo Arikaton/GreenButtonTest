@@ -15,6 +15,7 @@ public sealed class LevelInitializer : Initializer {
         enemyFilter = World.Filter.With<EnemyComponent>();
         playerFilter = World.Filter.With<PlayerComponent>();
 
+        //Set ground size and then bake
         var ground = World.Filter.With<GroundComponent>().Select<GroundComponent>().GetComponent(0);
         ground.transform.localScale = new Vector3(gameConfig.levelScale.x, 1, gameConfig.levelScale.y);
         ground.navMeshSurface.BuildNavMesh();

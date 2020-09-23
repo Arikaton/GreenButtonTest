@@ -27,6 +27,7 @@ public sealed class GameManagerSystem : UpdateSystem {
         //Not used yet
         gameManagerComponent.gameState = GameState.Starting;
 
+        //Creating local player instance
         if (!gameManagerComponent.haveLocalPlayer)
         {
             InstantiateNewLocalPlayer(ref gameManagerComponent);
@@ -63,6 +64,7 @@ public sealed class GameManagerSystem : UpdateSystem {
         }
     }
 
+    //Some spectator logic
     public override void OnUpdate(float deltaTime)
     {
         ref var gameManagerComponent = ref filter.First().GetComponent<GameManagerComponent>();

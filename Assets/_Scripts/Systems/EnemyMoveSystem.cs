@@ -30,6 +30,8 @@ public sealed class EnemyMoveSystem : UpdateSystem {
             ref var enemy = ref enemyBag.GetComponent(i);
             ref var move = ref moveBag.GetComponent(i);
 
+            //if have aim, move to it
+            //else move to random point
             if (enemy.aim != null)
             {
                 move.agent.SetDestination(enemy.aim.GetComponent<MoveViewComponent>().transform.position);

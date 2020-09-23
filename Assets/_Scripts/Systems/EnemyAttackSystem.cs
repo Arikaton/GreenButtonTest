@@ -28,6 +28,8 @@ public sealed class EnemyAttackSystem : UpdateSystem {
         for (int i = 0, lenght = enemyFilter.Length; i < lenght; i++)
         {
             ref var enemy = ref enemyBag.GetComponent(i);
+
+            //Attacking behaviour
             if (enemy.isAttacking)
             {
                 if (enemy.timeAfterLastAttack >= gameConfig.enemyAttackDelay)

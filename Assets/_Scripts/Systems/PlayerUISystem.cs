@@ -70,6 +70,8 @@ public sealed class PlayerUISystem : UpdateSystem, IInRoomCallbacks {
             {
                 int livePlayerCount = Utils.GetLivesPlayerCount();
                 Debug.Log("Lives player count: " + livePlayerCount);
+
+                //if exactly one player alive, and he didn't die yet
                 if (livePlayerCount == 1 && !uiComponent.losePopUp.activeSelf && !PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("PlayerDied"))
                 {
                     uiComponent.winPopUp.SetActive(true);
