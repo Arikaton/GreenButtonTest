@@ -80,7 +80,7 @@ public sealed class PlayerSystem : UpdateSystem, IInRoomCallbacks
     private static void LeaveRoom()
     {
         if (PhotonNetwork.NetworkClientState != ClientState.Leaving && PhotonNetwork.NetworkClientState != ClientState.ConnectedToMasterServer)
-            PhotonNetwork.Disconnect();
+            PhotonNetwork.Disconnect(); //use this method instead LeaveRoom cause it fix bug with leaving room
         UnityEngine.SceneManagement.SceneManager.LoadScene(0);
         //PhotonNetwork.LoadLevel(0);
     }

@@ -113,7 +113,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializedData:
     isAttacking: 0
-    timeAfterLastAttack: 0
+    timeAfterLastAttack: Infinity
 --- !u!114 &4111758084590905004
 MonoBehaviour:
   m_ObjectHideFlags: 0
